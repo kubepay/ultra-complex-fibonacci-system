@@ -1,0 +1,21 @@
+sudo: required
+services:
+  - docker
+
+before_install:
+  - docker build -t abhiesa/ultra-complex-fibonacci-system-client-test -f ./client/Dockerfile.dev ./client
+
+script:
+   - docker run -e CI=true abhiesa/ultra-complex-fibonacci-system-client-test npm run test
+
+after_success:
+   - docker build -t abhiesa/ultra-complex-fibonacci-system-client ./client
+   - docker build -t abhiesa/ultra-complex-fibonacci-system-nginx ./nginx
+   - docker build -t abhiesa/ultra-complex-fibonacci-system-server ./server
+   - docker build -t abhiesa/ultra-complex-fibonacci-system-worker ./worker
+   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+   - docker push abhiesa/ultra-complex-fibonacci-system-client
+   - docker push abhiesa/ultra-complex-fibonacci-system-nginx
+   - docker push abhiesa/ultra-complex-fibonacci-system-server
+   - docker push abhiesa/ultra-complex-fibonacci-system-worker
+
